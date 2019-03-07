@@ -55,7 +55,12 @@ public void keyPressed(KeyEvent arg0) {
 		container.keyLeft();
 	}else if (arg0.getKeyCode()==KeyEvent.VK_RIGHT) {
 		container.keyRight();
+	}else if (arg0.getKeyCode()==KeyEvent.VK_UP) {
+		container.pressedKeyUp();
+	}else if (arg0.getKeyCode()==KeyEvent.VK_DOWN) {
+		container.pressedKeyDown();
 	}
+
 }
 
 @Override

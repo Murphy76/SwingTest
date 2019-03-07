@@ -39,7 +39,6 @@ public class MyContainer extends JPanel {
 		gblc.weightx = 0.1;
 		gblc.weighty = 0.1;
 
-
 		Font labelFont = this.getFont();
 		Font myFont = new Font(labelFont.getName(), Font.PLAIN, 30);
 
@@ -88,7 +87,7 @@ public class MyContainer extends JPanel {
 
 	protected void moveUnderlyingLabel(Point point, JLabel source) {
 		GridBagLayout gbl = (GridBagLayout) this.getLayout();
-		int[][] dim = gbl.getLayoutDimensions();
+		int[][] dim = getDimensions();
 		int col = highlightIndex % dim[0].length;
 		int row = highlightIndex / dim[0].length;
 		int cols = dim[0].length;
@@ -160,7 +159,7 @@ public class MyContainer extends JPanel {
 		if (getComponentIndex(panels, label) >= 0) {
 			highlightIndex = getComponentIndex(panels, label);
 		}
-
+		sendInterfaceData();
 	}
 
 	public void setLabelBorder(JLabel label, Color color, int thickness) {
@@ -171,7 +170,7 @@ public class MyContainer extends JPanel {
 		try {
 			label.setBorder(BorderFactory.createLineBorder(color, 3));
 		} catch (NullPointerException e) {
-			//just skip it
+			// just skip it
 		}
 	}
 
@@ -182,6 +181,36 @@ public class MyContainer extends JPanel {
 			return idx.getAsInt();
 		}
 		return -1;
+
+	}
+
+	public int[][] getDimensions() {
+
+		return ((GridBagLayout) this.getLayout()).getLayoutDimensions();
+
+	}
+
+	public void pressedKeyUp() {
+		int col = highlightIndex % getDimensions().length;
+		int row = highlightIndex / getDimensions().length;
+		int newIndex = highlightIndex - getDimensions()[0].length;
+		if (newIndex > 0) {
+			highlightIndex = newIndex;
+			sendInterfaceData();
+			st.setTitle("Selected index is " + String.valueOf(highlightIndex));
+		}
+
+	}
+
+	public void pressedKeyDown() {
+		int col = highlightIndex % getDimensions().length;
+		int row = highlightIndex / getDimensions().length;
+		int newIndex = highlightIndex + getDimensions()[0].length;
+		if (newIndex < panelsCount) {
+			highlightIndex = newIndex;
+			sendInterfaceData();
+			st.setTitle("Selected index is " + String.valueOf(highlightIndex));
+		}
 
 	}
 
