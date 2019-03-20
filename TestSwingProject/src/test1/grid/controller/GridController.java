@@ -1,5 +1,7 @@
 package test1.grid.controller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -8,18 +10,27 @@ import java.awt.event.MouseListener;
 import java.util.stream.IntStream;
 
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import test1.grid.model.GridModel;
 import test1.grid.view.GridFrame;
 import test1.grid.view.GridPanel;
+import test1.grid.view.LabelMode;
+import test1.grid.view.MyLabel;
+import test1.grid.view.PopupLabelMode;
 
 public class GridController {
 
-	GridFrame view ;
-	GridModel gridModel = new GridModel(6,16);
-	GridPanel gridPanel = new GridPanel(600,600,gridModel);
+	GridFrame view;
+	GridModel gridModel = new GridModel(6, 16);
+	GridPanel gridPanel = new GridPanel(600, 600, gridModel);
+	PopupLabelMode pum = new PopupLabelMode();
 
-	public void initView () {
+	public void initView() {
 		view = new GridFrame(gridModel);
 		view.addGridPanel(gridPanel);
 		view.setVisible(true);
@@ -30,7 +41,7 @@ public class GridController {
 
 	private void initListeners() {
 
-		//add keyListener for view
+		// add keyListener for view
 		view.addPressKeyListener(new KeyListener() {
 
 			@Override
@@ -44,33 +55,49 @@ public class GridController {
 
 			@Override
 			public void keyPressed(KeyEvent paramKeyEvent) {
-				if (paramKeyEvent.getKeyCode()==KeyEvent.VK_LEFT) {
+				if (paramKeyEvent.getKeyCode() == KeyEvent.VK_LEFT) {
 					gridModel.highlightLeft();
-				}else if (paramKeyEvent.getKeyCode()==KeyEvent.VK_RIGHT) {
+				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_RIGHT) {
 					gridModel.highlightRight();
-				}else if (paramKeyEvent.getKeyCode()==KeyEvent.VK_UP) {
+				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_UP) {
 					gridModel.highlightUp(getDimensions());
-				}else if (paramKeyEvent.getKeyCode()==KeyEvent.VK_DOWN) {
+				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
 					gridModel.highlightDown(getDimensions());
 				}
 
-
-
 			}
 		});
-		//Set JLabel Mouse Listeners
+		// Set JLabel Mouse Listeners
 		MouseListener mListener = new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				if ((JLabel) e.getSource() != null) {
-					gridModel.changeSelectedLabel((JLabel) e.getSource());
+				if ((MyLabel) e.getSource() != null) {
+					gridModel.changeSelectedLabel((MyLabel) e.getSource());
 				}
 			}
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				gridModel.moveUnderlyingLabel((JLabel) e.getSource(), getDimensions());
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					gridModel.moveUnderlyingLabel((MyLabel) e.getSource(), getDimensions());
+				}
+			}
+			@Override
+			  public void mouseReleased(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					pum.setClickedLabel((MyLabel) e.getSource());
+					pum.show(e.getComponent(), e.getX(), e.getY());
+
+
+				}
+
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				if ((MyLabel) e.getSource() != null) {
+					gridModel.mouseExitedLabel((MyLabel) e.getSource());
+				}
 
 			}
 
@@ -79,13 +106,17 @@ public class GridController {
 			gridModel.getPanels()[i].addMouseListener(mListener);
 		});
 
+		gridPanel.setComponentPopupMenu(pum);
+
+
+
 	}
-	//get panel dimension
+
+	// get panel dimension
 	public int[][] getDimensions() {
 
 		return gridPanel.getDimensions();
 
 	}
-
 
 }

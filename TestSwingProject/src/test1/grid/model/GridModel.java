@@ -7,21 +7,27 @@ import javax.swing.JLabel;
 
 import test1.grid.observer.AbstractChangebleModel;
 import test1.grid.observer.FiredProperties;
+import test1.grid.view.MyLabel;
 
 public class GridModel extends AbstractChangebleModel {
 
 	int highlightIndex = 6;
-	JLabel[] panels;
+	MyLabel[] panels;
 
 	public GridModel(int highlightIndex, int panelsCount) {
 		this.highlightIndex = highlightIndex;
-		this.panels = new JLabel[panelsCount];
+		this.panels = new MyLabel[panelsCount];
 	}
 
 	public void highlightLeft() {
 		if (highlightIndex > 0) {
 			int current = highlightIndex;
-			highlightIndex--;
+			do {
+				highlightIndex--;
+			} while (panels[highlightIndex] == null && highlightIndex > 0);
+			if (panels[highlightIndex] == null) {
+				highlightIndex = current;
+			}
 			firePropertyChange(FiredProperties.KEY_LEFT.name(), panels[current], panels[highlightIndex]);
 			fireIndexCgange();
 		}
@@ -30,7 +36,12 @@ public class GridModel extends AbstractChangebleModel {
 	public void highlightRight() {
 		if (highlightIndex < panels.length - 1) {
 			int current = highlightIndex;
-			highlightIndex++;
+			do {
+				highlightIndex++;
+			} while (panels[highlightIndex] == null && highlightIndex <= panels.length);
+			if (panels[highlightIndex] == null) {
+				highlightIndex = current;
+			}
 			firePropertyChange(FiredProperties.KEY_RIGHT.name(), panels[current], panels[highlightIndex]);
 			fireIndexCgange();
 		}
@@ -38,21 +49,46 @@ public class GridModel extends AbstractChangebleModel {
 
 	public void highlightUp(int[][] dimensions) {
 		int current = highlightIndex;
-		int newIndex = highlightIndex - dimensions[0].length;
-		if (newIndex >= 0) {
-			highlightIndex = newIndex;
+		if (highlightIndex > 0) {
+			do {
+				highlightIndex = highlightIndex - dimensions[0].length;
+				if (highlightIndex < 0) {
+					highlightIndex = panels.length
+							- (dimensions[0].length - ((highlightIndex + dimensions[0].length) % dimensions[0].length))
+							- 1;
+					System.out.println(highlightIndex);
+				}
+
+			} while (panels[highlightIndex] == null && highlightIndex > 0);
+
+			if (panels[highlightIndex] == null) {
+				highlightIndex = current;
+			}
 			firePropertyChange(FiredProperties.KEY_UP.name(), panels[current], panels[highlightIndex]);
 			fireIndexCgange();
 		}
 	}
 
 	public void highlightDown(int[][] dimensions) {
-		int current = highlightIndex;
-		int newIndex = highlightIndex + dimensions[0].length;
-		if (newIndex < panels.length) {
-			highlightIndex = newIndex;
-			firePropertyChange(FiredProperties.KEY_DOWN.name(), panels[current], panels[highlightIndex]);
-			fireIndexCgange();
+		if (highlightIndex < panels.length -1) {
+			int current = highlightIndex;
+
+			do {
+				highlightIndex = highlightIndex + dimensions[0].length;
+				if (highlightIndex > panels.length -1) {
+					highlightIndex =  (((highlightIndex - dimensions[0].length) % dimensions[0].length))	+ 1;
+					System.out.println(highlightIndex);
+				}
+
+			} while (panels[highlightIndex] == null && highlightIndex > 0);
+
+
+
+			if (highlightIndex < panels.length) {
+
+				firePropertyChange(FiredProperties.KEY_DOWN.name(), panels[current], panels[highlightIndex]);
+				fireIndexCgange();
+			}
 		}
 	}
 
@@ -68,18 +104,19 @@ public class GridModel extends AbstractChangebleModel {
 		this.highlightIndex = highlightIndex;
 	}
 
-	public JLabel[] getPanels() {
+	public MyLabel[] getPanels() {
 		return panels;
 	}
 
-	public void changeSelectedLabel(JLabel highlightedLabel) {
+	public void changeSelectedLabel(MyLabel jLabel) {
 
-		firePropertyChange(FiredProperties.MOUSE_HOVER.name(), panels[highlightIndex], highlightedLabel);
-		highlightIndex = getComponentIndex(highlightedLabel);
+		firePropertyChange(FiredProperties.MOUSE_HOVER.name(), panels[highlightIndex], jLabel);
+		highlightIndex = jLabel.getIdx();// getComponentIndex(highlightedLabel);
+		System.out.println(jLabel.getIdx());
 		fireIndexCgange();
 	}
 
-	private int getComponentIndex(JLabel label) {
+	private int getComponentIndex(MyLabel label) {
 
 		OptionalInt idx = IntStream.range(0, panels.length).filter(i -> label.equals(panels[i])).findFirst();
 		if (idx.isPresent()) {
@@ -89,13 +126,26 @@ public class GridModel extends AbstractChangebleModel {
 
 	}
 
-	public void moveUnderlyingLabel(JLabel source, int[][] dimension) {
-		firePropertyChange(FiredProperties.MOUSE_CLICK.name(), highlightIndex, dimension);
+	public void moveUnderlyingLabel(MyLabel source, int[][] dimension) {
+		firePropertyChange(FiredProperties.MOUSE_L_CLICK.name(), highlightIndex, dimension);
 
 	}
 
 	public void highlightLabel() {
 		firePropertyChange(FiredProperties.HIGHLIGHT_LABEL.name(), null, panels[highlightIndex]);
+
+	}
+
+	public void mouseExitedLabel(MyLabel source) {
+
+	}
+
+	public void swapPanels(int toRemove, int moveUp) {
+
+		if (moveUp < panels.length) {
+			panels[toRemove] = panels[moveUp];
+			panels[moveUp] = null;
+		}
 
 	}
 }

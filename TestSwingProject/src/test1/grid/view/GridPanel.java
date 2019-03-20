@@ -2,34 +2,44 @@ package test1.grid.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import test1.grid.model.GridModel;
 import test1.grid.observer.FiredProperties;
 
 public class GridPanel extends JPanel implements PropertyChangeListener{
 
-
 	/**
 	 *
 	 */
+
+
 	private static final long serialVersionUID = 1L;
 	private final int ROWS_COUNT = 4;
 	private final int COLUMNS_COUNT = 4;
 	public final Color REGUILAR_COLOR = Color.blue;
 	public final Color HIGHLIGHT_COLOR = Color.green;
+	private int index;
+	public String s =  "Tomorrow, and tomorrow, and tomorrow, "
+	        + "creeps in this petty pace from day to day, "
+	        + "to the last syllable of recorded time; ... "
+	        + "It is a tale told by an idiot, full of "
+	        + "sound and fury signifying nothing.";
 
 	GridModel gridModel;
 
@@ -49,9 +59,10 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 		Font myFont = new Font(labelFont.getName(), Font.PLAIN, 30);
 
 		for (int i = 0; i < gridModel.getPanels().length; i++) {
-			gridModel.getPanels()[i] = new JLabel();
+			gridModel.getPanels()[i] = new MyLabel();
 			setLabelBorder(gridModel.getPanels()[i], REGUILAR_COLOR);
 			gridModel.getPanels()[i].setFont(myFont);
+			((MyLabel) gridModel.getPanels()[i]).setIdx(i);
 			gridModel.getPanels()[i].setText(String.valueOf(i));
 			gridModel.getPanels()[i].setHorizontalAlignment(SwingConstants.CENTER);
 			gblc.gridx = i % COLUMNS_COUNT;
@@ -62,23 +73,21 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 
 		}
 
-
-		 gridModel.addPropertyChangeListener(this);
+		gridModel.addPropertyChangeListener(this);
 	}
 
-
-	protected void removeLabel(JLabel labelRoRemove) {
+	protected void removeLabel(MyLabel labelRoRemove) {
 		this.remove(labelRoRemove);
 		this.revalidate();
 		this.repaint();
 
 	}
 
-	public void setLabelBorder(JLabel label, Color color, int thickness) {
+	public void setLabelBorder(MyLabel label, Color color, int thickness) {
 		label.setBorder(BorderFactory.createLineBorder(color, thickness));
 	}
 
-	public void setLabelBorder(JLabel label, Color color) {
+	public void setLabelBorder(MyLabel label, Color color) {
 		try {
 			label.setBorder(BorderFactory.createLineBorder(color, 3));
 		} catch (NullPointerException e) {
@@ -86,9 +95,10 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 		}
 	}
 
-	private int getComponentIndex(Component[] array, JLabel label) {
+	private int getComponentIndex(Component[] array, MyLabel label) {
 
-		OptionalInt idx = IntStream.range(0, array.length).filter(i -> label.equals(gridModel.getPanels()[i])).findFirst();
+		OptionalInt idx = IntStream.range(0, array.length).filter(i -> label.equals(gridModel.getPanels()[i]))
+				.findFirst();
 		if (idx.isPresent()) {
 			return idx.getAsInt();
 		}
@@ -102,49 +112,39 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 
 	}
 
-
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		String propertyName = evt.getPropertyName();
-		if (FiredProperties.MOUSE_CLICK.name().equals(propertyName)) {
+		if (FiredProperties.MOUSE_L_CLICK.name().equals(propertyName)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					int[][] dim = (int[][]) evt.getNewValue();
-					int col = (int)evt.getOldValue() % dim[0].length;
-					int row = (int)evt.getOldValue() / dim[0].length;
+					int col = (int) evt.getOldValue() % dim[0].length;
+					int row = gridModel.getHighlightIndex() / dim[0].length;
 					int cols = dim[0].length;
 					int rows = dim[1].length;
 
 					GridBagConstraints gblcMoveDown;
 					GridBagConstraints gblcMoveUp;
-					JLabel moveDown;
-					JLabel moveUp;
-					for (int i = row; i < rows; i++) {
+					MyLabel moveDown;
+					MyLabel moveUp;
 
-						moveDown = gridModel.getPanels()[col + cols * i];
-						if (moveDown == null) {
-							break;
-						}
-						gblcMoveDown = ((GridBagLayout)getLayout()).getConstraints(moveDown) ;
-						remove(moveDown);
-						if ((col + cols * (i + 1)) >= gridModel.getPanels().length) {
-							gridModel.getPanels()[col + cols * i] = null;
-							break;
-						}
-						moveUp = gridModel.getPanels()[col + cols * (i + 1)];
+					moveDown = gridModel.getPanels()[col + cols * row];
+					gblcMoveDown = ((GridBagLayout) getLayout()).getConstraints(moveDown);
+					remove(moveDown);
+					add(new MyLabel(), gblcMoveDown);
+					if ((col + cols * (row + 1)) < gridModel.getPanels().length) {
+						moveUp = gridModel.getPanels()[col + cols * (row + 1)];
 						if (moveUp != null) {
-							gblcMoveUp = ((GridBagLayout)getLayout()).getConstraints(moveUp) ;
-							remove(moveUp);
+							gblcMoveUp = ((GridBagLayout) getLayout()).getConstraints(moveUp);
 							add(moveUp, gblcMoveDown);
-							add(moveDown, gblcMoveUp);
-							gridModel.getPanels()[col + cols * i] = moveUp;
-							gridModel.getPanels()[col + cols * (i + 1)] = moveDown;
-						} else {
-							gridModel.getPanels()[col + cols * i] = null;
+							moveUp.setIdx(moveDown.getIdx());
+							add(new MyLabel(), gblcMoveUp);
 						}
-
 					}
+					gridModel.swapPanels(col + cols * row, col + cols * (row + 1));
+
 					gridModel.highlightLabel();
 					validate();
 					repaint();
@@ -153,5 +153,7 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 		}
 
 	}
+
+
 
 }
