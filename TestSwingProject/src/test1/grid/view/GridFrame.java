@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import test1.grid.model.GridModel;
@@ -55,8 +56,8 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getOldValue(), REGUILAR_COLOR);
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getOldValue(), REGUILAR_COLOR);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -65,8 +66,8 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getOldValue(), REGUILAR_COLOR);
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getOldValue(), REGUILAR_COLOR);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -75,8 +76,8 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getOldValue(), REGUILAR_COLOR);
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getOldValue(), REGUILAR_COLOR);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -85,8 +86,8 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getOldValue(), REGUILAR_COLOR);
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getOldValue(), REGUILAR_COLOR);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -104,8 +105,8 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getOldValue(), REGUILAR_COLOR);
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getOldValue(), REGUILAR_COLOR);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -115,7 +116,7 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					setLabelBorder((MyLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
+					setLabelBorder((JLabel) evt.getNewValue(), HIGHLIGHT_COLOR, 3);
 
 				}
 			});
@@ -128,13 +129,13 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 
 	}
 
-	public void setLabelBorder(MyLabel label, Color color, int thickness) {
+	public void setLabelBorder(JLabel label, Color color, int thickness) {
 		if (label != null) {
 			label.setBorder(BorderFactory.createLineBorder(color, thickness));
 		}
 	}
 
-	public void setLabelBorder(MyLabel label, Color color) {
+	public void setLabelBorder(JLabel label, Color color) {
 		try {
 			label.setBorder(BorderFactory.createLineBorder(color, 3));
 		} catch (NullPointerException e) {

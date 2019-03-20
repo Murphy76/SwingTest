@@ -1,7 +1,5 @@
 package test1.grid.controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -9,17 +7,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.stream.IntStream;
 
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 import test1.grid.model.GridModel;
 import test1.grid.view.GridFrame;
 import test1.grid.view.GridPanel;
-import test1.grid.view.LabelMode;
 import test1.grid.view.MyLabel;
 import test1.grid.view.PopupLabelMode;
 
