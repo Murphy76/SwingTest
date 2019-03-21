@@ -11,6 +11,10 @@ import javax.swing.Timer;
 
 public class MyLabel extends JLabel implements ActionListener {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private final Timer timer = new Timer(500, this);
 	private int idx;
 	private LabelMode mode;

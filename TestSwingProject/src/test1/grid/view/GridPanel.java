@@ -75,16 +75,7 @@ public class GridPanel extends JPanel implements PropertyChangeListener {
 		}
 	}
 
-	private int getComponentIndex(Component[] array, MyLabel label) {
 
-		OptionalInt idx = IntStream.range(0, array.length).filter(i -> label.equals(gridModel.getPanels()[i]))
-				.findFirst();
-		if (idx.isPresent()) {
-			return idx.getAsInt();
-		}
-		return -1;
-
-	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -93,17 +84,8 @@ public class GridPanel extends JPanel implements PropertyChangeListener {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-//					int col = -1;
-//					col = (int) evt.getOldValue() % dim[0].length;
-//					int row = gridModel.getHighlightIndex() / dim[0].length;
-//					int cols = dim[0].length;
-//					int rows = dim[1].length;
-
-					MyLabel moveDown;
-					MyLabel moveUp;
-
-					moveDown = (MyLabel) evt.getOldValue();
-					moveUp = (MyLabel) evt.getNewValue();
+					MyLabel moveDown=(MyLabel) evt.getOldValue();
+					MyLabel moveUp=(MyLabel) evt.getNewValue();
 					remove(moveDown);
 					if (moveUp!=null) {
 						remove(moveUp);
@@ -113,25 +95,7 @@ public class GridPanel extends JPanel implements PropertyChangeListener {
 						add(new MyLabel(), gridModel.getHighlightIndex());
 					}
 
-
-					//add(new MyLabel(), gblcMoveDown);
-//					if (gridModel.getHighlightIndex()+ gridModel.getRow() < gridModel.getPanels().length) {
-//						if ()
-//						add (gridModel.getPanels()[gridModel.getHighlightIndex()+ gridModel.getRow()], gridModel.getHighlightIndex());
-//						add(new MyLabel(), gridModel.getHighlightIndex()+ gridModel.getRow());
-//
-////						moveUp = gridModel.getPanels()[col + cols * (row + 1)];
-////						if (moveUp != null) {
-////							gblcMoveUp = ((GridBagLayout) getLayout()).getConstraints(moveUp);
-////							add(moveUp, gblcMoveDown);
-////							moveUp.setIdx(moveDown.getIdx());
-////							add(new MyLabel(), gblcMoveUp);
-////						}
-//					}else {
-//						add (new MyLabel(), gridModel.getHighlightIndex());
-//					}
 					gridModel.swapPanels();
-//
 					gridModel.highlightLabel();
 					validate();
 					repaint();

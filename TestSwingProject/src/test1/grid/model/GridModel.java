@@ -119,16 +119,6 @@ public class GridModel extends AbstractChangebleModel {
 		fireIndexCgange();
 	}
 
-	private int getComponentIndex(MyLabel label) {
-
-		OptionalInt idx = IntStream.range(0, panels.length).filter(i -> label.equals(panels[i])).findFirst();
-		if (idx.isPresent()) {
-			return idx.getAsInt();
-		}
-		return -1;
-
-	}
-
 	public void moveUnderlyingLabel() {
 
 		firePropertyChange(FiredProperties.MOUSE_L_CLICK.name(), panels[highlightIndex],

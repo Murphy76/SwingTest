@@ -27,11 +27,6 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 	public final Color HIGHLIGHT_COLOR = Color.green;
 
 	GridModel gridModel;
-	// ......
-
-	// private variables of UI components
-	// ......
-
 
 	/** Constructor to setup the UI components */
 	public GridFrame(GridModel gridModel2) {

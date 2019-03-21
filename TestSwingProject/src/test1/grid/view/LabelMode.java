@@ -8,8 +8,6 @@ public enum LabelMode {
 	private LabelMode(final String text) {
 		this.text = text;
 	}
-
-
 	@Override
 	public String toString() {
 		return text;

@@ -105,9 +105,11 @@ public class GridController {
 			}
 
 		};
+		//init listeners for Labels
 		IntStream.range(0, gridModel.getPanels().length).forEach(i -> {
 			gridModel.getPanels()[i].addMouseListener(mListener);
 		});
+		//init context menu for Labels
 		IntStream.range(0, gridModel.getPanels().length).forEach(i -> {
 			gridModel.getPanels()[i].setComponentPopupMenu(pum);
 		});
