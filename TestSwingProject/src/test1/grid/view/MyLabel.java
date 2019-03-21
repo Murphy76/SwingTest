@@ -1,6 +1,7 @@
 package test1.grid.view;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +15,16 @@ public class MyLabel extends JLabel implements ActionListener {
 	private int idx;
 	private LabelMode mode;
 	private int index;
-	private String runningStr = "dfsdfg bwe w4eh wetrh werth";
-	private Color blinkColor = Color.GREEN;
-	private Color regularColor = Color.LIGHT_GRAY;
+	private String runningStr = "text....";
+	private Color blinkColor = Color.yellow;
+	private Color regularColor ;
 
 
 	public MyLabel() {
 		super();
 		setFont(new Font(Font.MONOSPACED, Font.PLAIN, Font.BOLD));
-
+		regularColor = getBackground();
+		setMaximumSize(new Dimension(150, 150));
 
 	}
 	public int getIdx() {
@@ -40,26 +42,34 @@ public class MyLabel extends JLabel implements ActionListener {
 
     public void start() {
         timer.start();
+        setOpaque(true);
     }
 
     public void stop() {
         timer.stop();
+        setOpaque(false);
+		this.revalidate();
+		this.repaint();
+
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
     	if (LabelMode.RUNNING_STR.equals(mode)){
         index++;
-        if (index > getRunningStr().length() - 15) {
+        if (index > getRunningStr().length() - 5) {
             index = 0;
         }
-        setText(getRunningStr().substring(index, index + 15));
+        setText(getRunningStr().substring(index, index + 5));
     	} else if (	LabelMode.BLINKED.equals(mode)){
-    		if (regularColor.equals(getForeground())) {
-    			setForeground(blinkColor);
+
+    		if (regularColor.getRGB() == getBackground().getRGB()) {
+    			setOpaque(true);
+    			setBackground(blinkColor);
 
     		}else {
-    			setForeground(regularColor);
+    			setOpaque(false);
+    			setBackground(regularColor);
     		}
     	}
     }

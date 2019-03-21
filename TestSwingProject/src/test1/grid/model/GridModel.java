@@ -11,12 +11,16 @@ import test1.grid.view.MyLabel;
 
 public class GridModel extends AbstractChangebleModel {
 
+	private int col = 4;
+	private int row = 4;
 	int highlightIndex = 6;
 	MyLabel[] panels;
 
-	public GridModel(int highlightIndex, int panelsCount) {
+	public GridModel(int highlightIndex, int col, int row) {
+		this.col = col;
+		this.row = row;
 		this.highlightIndex = highlightIndex;
-		this.panels = new MyLabel[panelsCount];
+		this.panels = new MyLabel[col * row];
 	}
 
 	public void highlightLeft() {
@@ -38,7 +42,8 @@ public class GridModel extends AbstractChangebleModel {
 			int current = highlightIndex;
 			do {
 				highlightIndex++;
-			} while (panels[highlightIndex] == null && highlightIndex <= panels.length);
+			} while (highlightIndex < (panels.length - 1) && panels[highlightIndex] == null);
+
 			if (panels[highlightIndex] == null) {
 				highlightIndex = current;
 			}
@@ -47,16 +52,13 @@ public class GridModel extends AbstractChangebleModel {
 		}
 	}
 
-	public void highlightUp(int[][] dimensions) {
+	public void highlightUp() {
 		int current = highlightIndex;
 		if (highlightIndex > 0) {
 			do {
-				highlightIndex = highlightIndex - dimensions[0].length;
+				highlightIndex = highlightIndex - getRow();
 				if (highlightIndex < 0) {
-					highlightIndex = panels.length
-							- (dimensions[0].length - ((highlightIndex + dimensions[0].length) % dimensions[0].length))
-							- 1;
-					System.out.println(highlightIndex);
+					highlightIndex = panels.length - (getRow() - ((highlightIndex + getRow()) % getRow())) - 1;
 				}
 
 			} while (panels[highlightIndex] == null && highlightIndex > 0);
@@ -69,26 +71,28 @@ public class GridModel extends AbstractChangebleModel {
 		}
 	}
 
-	public void highlightDown(int[][] dimensions) {
-		if (highlightIndex < panels.length -1) {
+	public void highlightDown() {
+		if (highlightIndex < panels.length) {
 			int current = highlightIndex;
 
 			do {
-				highlightIndex = highlightIndex + dimensions[0].length;
-				if (highlightIndex > panels.length -1) {
-					highlightIndex =  (((highlightIndex - dimensions[0].length) % dimensions[0].length))	+ 1;
-					System.out.println(highlightIndex);
+				highlightIndex = highlightIndex + getRow();
+				if (highlightIndex > (panels.length - 1)) {
+					highlightIndex = (((highlightIndex - getRow()) % getRow())) + 1;
 				}
 
 			} while (panels[highlightIndex] == null && highlightIndex > 0);
 
-
+			if (highlightIndex == getCol() && current > highlightIndex) {
+				highlightIndex = current;
+			}
 
 			if (highlightIndex < panels.length) {
 
 				firePropertyChange(FiredProperties.KEY_DOWN.name(), panels[current], panels[highlightIndex]);
 				fireIndexCgange();
 			}
+
 		}
 	}
 
@@ -112,7 +116,6 @@ public class GridModel extends AbstractChangebleModel {
 
 		firePropertyChange(FiredProperties.MOUSE_HOVER.name(), panels[highlightIndex], jLabel);
 		highlightIndex = jLabel.getIdx();// getComponentIndex(highlightedLabel);
-		System.out.println(jLabel.getIdx());
 		fireIndexCgange();
 	}
 
@@ -126,8 +129,10 @@ public class GridModel extends AbstractChangebleModel {
 
 	}
 
-	public void moveUnderlyingLabel(MyLabel source, int[][] dimension) {
-		firePropertyChange(FiredProperties.MOUSE_L_CLICK.name(), highlightIndex, dimension);
+	public void moveUnderlyingLabel() {
+
+		firePropertyChange(FiredProperties.MOUSE_L_CLICK.name(), panels[highlightIndex],
+				highlightIndex + getRow() > panels.length ? null : panels[highlightIndex + getRow()]);
 
 	}
 
@@ -140,12 +145,26 @@ public class GridModel extends AbstractChangebleModel {
 
 	}
 
-	public void swapPanels(int toRemove, int moveUp) {
+	public void swapPanels() {
 
-		if (moveUp < panels.length) {
-			panels[toRemove] = panels[moveUp];
-			panels[moveUp] = null;
+		if (highlightIndex + getRow() < panels.length) {
+			panels[highlightIndex] = panels[highlightIndex + getRow()];
+			if (panels[highlightIndex] != null) {
+				panels[highlightIndex].setIdx(highlightIndex);
+			}
+			panels[highlightIndex + getRow()] = null;
+
+		} else {
+			panels[highlightIndex] = null;
 		}
 
+	}
+
+	public int getCol() {
+		return col;
+	}
+
+	public int getRow() {
+		return row;
 	}
 }

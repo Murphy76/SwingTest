@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import javax.swing.SwingUtilities;
@@ -12,14 +13,18 @@ import javax.swing.SwingUtilities;
 import test1.grid.model.GridModel;
 import test1.grid.view.GridFrame;
 import test1.grid.view.GridPanel;
+import test1.grid.view.LabelMode;
 import test1.grid.view.MyLabel;
 import test1.grid.view.PopupLabelMode;
 
 public class GridController {
 
+	private int col = 4;
+	private int row = 4;
 	GridFrame view;
-	GridModel gridModel = new GridModel(6, 16);
+	GridModel gridModel = new GridModel(6, col, row);
 	GridPanel gridPanel = new GridPanel(600, 600, gridModel);
+
 	PopupLabelMode pum = new PopupLabelMode();
 
 	public void initView() {
@@ -29,6 +34,20 @@ public class GridController {
 		initListeners();
 		gridModel.fireIndexCgange();
 		gridModel.highlightLabel();
+
+		setLabelRandomMode();
+
+	}
+
+	private void setLabelRandomMode() {
+		Random rnd = new Random();
+		int tmp = rnd.nextInt(col * row);
+		gridModel.getPanels()[tmp].setMode(LabelMode.BLINKED);
+		gridModel.getPanels()[tmp].start();
+		tmp = rnd.nextInt(col * row);
+		gridModel.getPanels()[tmp].setMode(LabelMode.RUNNING_STR);
+		gridModel.getPanels()[tmp].start();
+
 	}
 
 	private void initListeners() {
@@ -52,9 +71,9 @@ public class GridController {
 				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_RIGHT) {
 					gridModel.highlightRight();
 				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_UP) {
-					gridModel.highlightUp(getDimensions());
+					gridModel.highlightUp();
 				} else if (paramKeyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
-					gridModel.highlightDown(getDimensions());
+					gridModel.highlightDown();
 				}
 
 			}
@@ -72,19 +91,11 @@ public class GridController {
 			public void mouseClicked(MouseEvent e) {
 
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					gridModel.moveUnderlyingLabel((MyLabel) e.getSource(), getDimensions());
+					gridModel.moveUnderlyingLabel();
 				}
 			}
-			@Override
-			  public void mouseReleased(MouseEvent e) {
-				if (SwingUtilities.isRightMouseButton(e)) {
-					pum.setClickedLabel((MyLabel) e.getSource());
-					pum.show(e.getComponent(), e.getX(), e.getY());
 
 
-				}
-
-			}
 			@Override
 			public void mouseExited(MouseEvent e) {
 				if ((MyLabel) e.getSource() != null) {
@@ -97,18 +108,12 @@ public class GridController {
 		IntStream.range(0, gridModel.getPanels().length).forEach(i -> {
 			gridModel.getPanels()[i].addMouseListener(mListener);
 		});
+		IntStream.range(0, gridModel.getPanels().length).forEach(i -> {
+			gridModel.getPanels()[i].setComponentPopupMenu(pum);
+		});
 
-		gridPanel.setComponentPopupMenu(pum);
-
-
-
-	}
-
-	// get panel dimension
-	public int[][] getDimensions() {
-
-		return gridPanel.getDimensions();
 
 	}
+
 
 }

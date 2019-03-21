@@ -2,12 +2,9 @@ package test1.grid.view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.OptionalInt;
@@ -17,43 +14,28 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import test1.grid.model.GridModel;
 import test1.grid.observer.FiredProperties;
 
-public class GridPanel extends JPanel implements PropertyChangeListener{
+public class GridPanel extends JPanel implements PropertyChangeListener {
 
 	/**
 	 *
 	 */
 
-
 	private static final long serialVersionUID = 1L;
-	private final int ROWS_COUNT = 4;
-	private final int COLUMNS_COUNT = 4;
 	public final Color REGUILAR_COLOR = Color.blue;
 	public final Color HIGHLIGHT_COLOR = Color.green;
-	private int index;
-	public String s =  "Tomorrow, and tomorrow, and tomorrow, "
-	        + "creeps in this petty pace from day to day, "
-	        + "to the last syllable of recorded time; ... "
-	        + "It is a tale told by an idiot, full of "
-	        + "sound and fury signifying nothing.";
-
 	GridModel gridModel;
 
-	public GridPanel(int windowWidth, int windowHeight, GridModel model) {
-		this.gridModel = model;
+	public GridPanel(int windowWidth, int windowHeight, GridModel gridModel2) {
+
+		this.gridModel = gridModel2;
 		this.setSize(windowWidth, windowHeight);
 
-		GridBagLayout gbl = new GridBagLayout();
+		GridLayout gbl = new GridLayout(gridModel2.getRow(), gridModel2.getCol());
 		this.setLayout(gbl);
-		GridBagConstraints gblc = new GridBagConstraints();
-		gblc.fill = GridBagConstraints.BOTH;
-		gblc.anchor = GridBagConstraints.CENTER;
-		gblc.weightx = 0.1;
-		gblc.weighty = 0.1;
 
 		Font labelFont = this.getFont();
 		Font myFont = new Font(labelFont.getName(), Font.PLAIN, 30);
@@ -65,10 +47,8 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 			((MyLabel) gridModel.getPanels()[i]).setIdx(i);
 			gridModel.getPanels()[i].setText(String.valueOf(i));
 			gridModel.getPanels()[i].setHorizontalAlignment(SwingConstants.CENTER);
-			gblc.gridx = i % COLUMNS_COUNT;
-			gblc.gridy = i / ROWS_COUNT;
-
-			gbl.setConstraints(gridModel.getPanels()[i], gblc);
+			((MyLabel) gridModel.getPanels()[i]).setToolTipText("Use context menu to set the label mode.");
+			((MyLabel) gridModel.getPanels()[i]).setLayout(new FlowLayout());
 			this.add(gridModel.getPanels()[i]);
 
 		}
@@ -106,12 +86,6 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 
 	}
 
-	public int[][] getDimensions() {
-
-		return ((GridBagLayout) this.getLayout()).getLayoutDimensions();
-
-	}
-
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		String propertyName = evt.getPropertyName();
@@ -119,32 +93,45 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					int[][] dim = (int[][]) evt.getNewValue();
-					int col = (int) evt.getOldValue() % dim[0].length;
-					int row = gridModel.getHighlightIndex() / dim[0].length;
-					int cols = dim[0].length;
-					int rows = dim[1].length;
+//					int col = -1;
+//					col = (int) evt.getOldValue() % dim[0].length;
+//					int row = gridModel.getHighlightIndex() / dim[0].length;
+//					int cols = dim[0].length;
+//					int rows = dim[1].length;
 
-					GridBagConstraints gblcMoveDown;
-					GridBagConstraints gblcMoveUp;
 					MyLabel moveDown;
 					MyLabel moveUp;
 
-					moveDown = gridModel.getPanels()[col + cols * row];
-					gblcMoveDown = ((GridBagLayout) getLayout()).getConstraints(moveDown);
+					moveDown = (MyLabel) evt.getOldValue();
+					moveUp = (MyLabel) evt.getNewValue();
 					remove(moveDown);
-					add(new MyLabel(), gblcMoveDown);
-					if ((col + cols * (row + 1)) < gridModel.getPanels().length) {
-						moveUp = gridModel.getPanels()[col + cols * (row + 1)];
-						if (moveUp != null) {
-							gblcMoveUp = ((GridBagLayout) getLayout()).getConstraints(moveUp);
-							add(moveUp, gblcMoveDown);
-							moveUp.setIdx(moveDown.getIdx());
-							add(new MyLabel(), gblcMoveUp);
-						}
+					if (moveUp!=null) {
+						remove(moveUp);
+						add(moveUp, gridModel.getHighlightIndex());
+						add(new MyLabel(), gridModel.getHighlightIndex()+ gridModel.getRow());
+					}else {
+						add(new MyLabel(), gridModel.getHighlightIndex());
 					}
-					gridModel.swapPanels(col + cols * row, col + cols * (row + 1));
 
+
+					//add(new MyLabel(), gblcMoveDown);
+//					if (gridModel.getHighlightIndex()+ gridModel.getRow() < gridModel.getPanels().length) {
+//						if ()
+//						add (gridModel.getPanels()[gridModel.getHighlightIndex()+ gridModel.getRow()], gridModel.getHighlightIndex());
+//						add(new MyLabel(), gridModel.getHighlightIndex()+ gridModel.getRow());
+//
+////						moveUp = gridModel.getPanels()[col + cols * (row + 1)];
+////						if (moveUp != null) {
+////							gblcMoveUp = ((GridBagLayout) getLayout()).getConstraints(moveUp);
+////							add(moveUp, gblcMoveDown);
+////							moveUp.setIdx(moveDown.getIdx());
+////							add(new MyLabel(), gblcMoveUp);
+////						}
+//					}else {
+//						add (new MyLabel(), gridModel.getHighlightIndex());
+//					}
+					gridModel.swapPanels();
+//
 					gridModel.highlightLabel();
 					validate();
 					repaint();
@@ -153,7 +140,5 @@ public class GridPanel extends JPanel implements PropertyChangeListener{
 		}
 
 	}
-
-
 
 }

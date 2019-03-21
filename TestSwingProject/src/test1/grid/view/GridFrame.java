@@ -34,11 +34,11 @@ public class GridFrame extends JFrame implements PropertyChangeListener {
 
 
 	/** Constructor to setup the UI components */
-	public GridFrame(GridModel gridModel) {
-		this.gridModel = gridModel;
+	public GridFrame(GridModel gridModel2) {
+		this.gridModel = gridModel2;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit when close button clicked
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT); // or pack() the components
-		gridModel.addPropertyChangeListener(this);
+		gridModel2.addPropertyChangeListener(this);
 	}
 
 
