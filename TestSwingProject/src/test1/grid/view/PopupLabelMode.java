@@ -7,6 +7,10 @@ import javax.swing.JPopupMenu;
 
 public class PopupLabelMode extends JPopupMenu {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	MyLabel clickedLabel = null;
 
 	public PopupLabelMode() throws HeadlessException {
